@@ -19,10 +19,13 @@ const FriendPlayer = makePlayer("Friend", "O");
 const gameBoard = (() => {
     let board = Array(9).fill(null);
 
-    
+    const getBoard = () => board;
+
     const isBoardFull = () => {
         return !board.includes(null);
     };
+
+    
     
 
     const makeMove = (index, symbol) => {
@@ -39,13 +42,6 @@ const gameBoard = (() => {
     const resetBoard = () => {
         board = Array(9).fill(null);
         
-    };
-    
-
-    // Renders the board to console.
-    
-    const displayBoard = () => {
-        console.log(board);
     };
     
 
@@ -73,19 +69,49 @@ const gameBoard = (() => {
         };
 
         return null;
+
     };
 
 
+    const checkDraw = () => {
+        if(isBoardFull & checkWinner === null) {
+            console.log("Draw!")
+        };
+    };
+
+    
+    
     // Makes all the functions available(now called "methods"
     // because they are stored in an object.)
-
+    
     return {
         checkWinner,
+        checkDraw,
         isBoardFull,
         makeMove,
         resetBoard,
-        displayBoard,
+        getBoard,
+
     };
     
+    
+})();
 
+    const Display = (() => {
+        const render = (board) => {
+            console.log(gameBoard.getBoard().slice(0, 3));
+            console.log("----------------");
+            console.log(gameBoard.getBoard().slice(3, 6));
+            console.log("----------------");
+            console.log(gameBoard.getBoard().slice(6));
+        };
+
+        const clearConsole = () => {
+            console.clear();
+        };
+
+        return {
+            render,
+            clearConsole
+        };
 })();

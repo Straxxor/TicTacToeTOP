@@ -1,6 +1,3 @@
-// Factory Function for generating players.
-// To be used later so that the player can
-// use his name and pick his symbol.
 
 function makePlayer(name, symbol) {
     return {
@@ -9,45 +6,67 @@ function makePlayer(name, symbol) {
     };
 };
 
-const currentPlayer = makePlayer("Strahinja", "X");
-const FriendPlayer = makePlayer("Friend", "O");
-
-
-
-// IIFE Module, used for game setting and logic.
-
 const gameBoard = (() => {
     let board = Array(9).fill(null);
-
+    
     const getBoard = () => board;
-
+    
     const isBoardFull = () => {
         return !board.includes(null);
     };
-
     
-    
-
-    const makeMove = (index, symbol) => {
-        if (board[index] === null) {
-            board[index] = symbol;
-            return true; // field was empty - move done
-        }
-        return false // field wasn't empty - move not done
-    };
-    
-
-    // Resets the board.
-    
+   
     const resetBoard = () => {
         board = Array(9).fill(null);
         
     };
     
+    return {
 
-    //logic for checking winner
+        isBoardFull,
+        resetBoard,
+        getBoard,
+        
+    };
+    
+    
+})();
+
+const displayController = (() => {
+    const render = (board) => {
+        console.log(gameBoard.getBoard().slice(0, 3));
+        console.log("----------------");
+        console.log(gameBoard.getBoard().slice(3, 6));
+        console.log("----------------");
+        console.log(gameBoard.getBoard().slice(6));
+    };
+    
+    const clearConsole = () => {
+        console.clear();
+    };
+    
+    return {
+        render,
+        clearConsole
+    };
+})();
+
+const gameController = (() => {
+    const playerX = makePlayer("PlayerX", "X");
+    const playerO = makePlayer("PlayerO", "O");
+    let currentPlayer = playerX;
+    let gameActive = true;
+    
+    const switchPlayers = () => {
+        if(currentPlayer === playerX) {
+            currentPlayer = playerO;
+        } else {
+            currentPlayer = playerX;
+        };
+    };
 
     const checkWinner = () => {
+        const board = gameBoard.getBoard();
         
         const winPatterns = [
             [0, 1, 2],
@@ -59,59 +78,45 @@ const gameBoard = (() => {
             [0, 4, 8],
             [2, 4, 6]
         ];
-
+        
         for (pattern of winPatterns) {
             const [a, b, c] = pattern;
             if (board[a] !== null && board[a] === board[b] && board[a] === board[c]) {
-                console.log("Winner winner chicken dinner!");
+                console.log(`Winner winner chicken dinner! Congratulations ${currentPlayer.name}`);
                 return board[a];
             };
         };
-
+        
         return null;
-
+        
     };
-
 
     const checkDraw = () => {
-        if(isBoardFull & checkWinner === null) {
+        const boardFull = gameBoard.isBoardFull();
+
+        if(boardFull & checkWinner === null) {
             console.log("Draw!")
-        };
+        }; 
     };
 
-    
-    
-    // Makes all the functions available(now called "methods"
-    // because they are stored in an object.)
-    
+    const makeMove = (index) => {
+            const board = gameBoard.getBoard();
+        if (board[index] === null) {
+            board[index] = currentPlayer.symbol;
+            displayController.clearConsole();
+            displayController.render();
+            checkDraw();
+            checkWinner();
+            switchPlayers();
+            return true; // field was empty - move done
+        }
+        return false // field wasn't empty - move not done
+    };
+
     return {
+        switchPlayers,
         checkWinner,
         checkDraw,
-        isBoardFull,
         makeMove,
-        resetBoard,
-        getBoard,
-
     };
-    
-    
-})();
-
-    const Display = (() => {
-        const render = (board) => {
-            console.log(gameBoard.getBoard().slice(0, 3));
-            console.log("----------------");
-            console.log(gameBoard.getBoard().slice(3, 6));
-            console.log("----------------");
-            console.log(gameBoard.getBoard().slice(6));
-        };
-
-        const clearConsole = () => {
-            console.clear();
-        };
-
-        return {
-            render,
-            clearConsole
-        };
 })();
